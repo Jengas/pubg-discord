@@ -174,7 +174,7 @@ setInterval(async function() {
       .write()
     var oldmatch = checkmatch.lastmatch;
     if (lastmatch != oldmatch) {
-      // console.log("HE NEEEEEEEEEEEEEED GET THIS MATCH");
+       // console.log("HE NEEEEEEEEEEEEEED GET THIS MATCH");
       var userObject = getObjects(Match, '', n_pubgUser);
       var username = getValues(userObject, 'name');
       var winPlace = getValues(userObject, 'winPlace');
@@ -219,7 +219,6 @@ setInterval(async function() {
       await client.users.get(n_uid).send(`Your lastest stats about match:`, playerEmbed);
     } else {
       // console.log("HE DONT NEEEEEEEEEEED GET NOOOOOO");
-      return;
     }
     db.get('users')
       .find({
@@ -232,7 +231,7 @@ setInterval(async function() {
     // console.log("Assigned last match");
   }
 
-}, 300 * 1000);
+}, 200 * 1000);
 
 
 // Login to Discord API

@@ -47,7 +47,7 @@ exports.run = async (client, message, args) => {
         .assign({
           pubgUser: pubgUser,
           pubgServer: pubgServer,
-          notify: "false"
+          notify: "false",
         })
         .write()
       console.log(`${message.author.tag} (${message.author.id}) - updated his PUBG data for Database`);
@@ -61,7 +61,8 @@ exports.run = async (client, message, args) => {
         uid: message.member.id,
         pubgUser: pubgUser,
         pubgServer: pubgServer,
-        notify: "false"
+        notify: "false",
+        lastmatch: "null"
       })
       .write()
     console.log(`${message.author.tag} (${message.author.id}) - executed command $addaccount`);

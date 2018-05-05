@@ -12,6 +12,7 @@ exports.run = async (client, message, args) => {
     .addField("User info:", "__$user NickName Server__\n[EXAMPLE: ``$user Jengas pc-eu``]", true)
     .addField("Match list:", "__$matchlist NickName Server__\n[EXAMPLE: ``$matchlist Jengas pc-eu``]", true)
     .addField("Match info:", "__$matchinfo NickName MatchID Server__\n[EXAMPLE: ``$matchinfo Jengas 1de1332c-985a-4825-b320-32e40e24b6ef``]", true)
+    .addField("Get stats evry match:", "__$notify__\n[EXAMPLE: ``$notify``]", true)
 
   await message.channel.send(`${message.author.toString()}, your help is delivered!`, helpEmbed);
   console.log(`${message.author.tag} (${message.author.id}) - executed command $help`);
