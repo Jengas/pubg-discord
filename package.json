@@ -1,7 +1,7 @@
 {
   "name": "PUBG DISCORD BOT",
-  "description": "Shows users stats",
-  "version": "v1.0.0",
+  "description": "PUBG Bot that can show statistics about user",
+  "version": "v1.2.0",
   "keywords": [
     "PUBG"
   ],
@@ -18,7 +18,9 @@
   "dependencies": {
     "": "",
     "discord.js": "^11.3.2",
-    "pubg.js": "^3.1.0"
+    "enmap": "^2.2.1",
+    "lowdb": "^1.0.0",
+    "pubg.js": "^3.5.1"
   },
-  "homepage": "https://equestria.space"
+  "homepage": "https://equestria.space/pubgbot"
 }

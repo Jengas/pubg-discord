@@ -1,6 +1,5 @@
 {
   "prefix": "$",
-  "discordtoken": "yourtokenhere",
-  "game": "playingstatus",
-  "pubgtoken": "PUBGTOKEN"
-}
+  "token": "yoursupertokenhere",
+  "game": "solo ffp",
+  "pubgtoken": "putpubg.tokenhere"

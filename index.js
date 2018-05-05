@@ -1,131 +1,239 @@
+// DISCORD AND COMMAND HANDLER
 const Discord = require("discord.js");
-const pubg = require('pubg.js');
+const Enmap = require("enmap");
+const fs = require("fs");
+
+// Config and client
 const client = new Discord.Client();
 const config = require("./settings/config.json");
-// PUBG KEY
+// We also need to make sure we're attaching the config to the CLIENT so it's accessible everywhere!
+client.config = config;
+client.Discord = Discord;
+
+
+// JSON DATABASE Module
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const adapter = new FileSync('data/db.json')
+const db = low(adapter)
+client.low = low;
+client.FileSync = FileSync;
+client.adapter = adapter;
+client.db = db;
+
+// PUBG CLIENT
+const pubg = require('pubg.js');
 const pubgClient = new pubg.Client(config.pubgtoken);
+client.pubgClient = pubgClient;
 
-// Set the prefix
-let prefix = config.prefix;
+// LIST OF PUBG SERVERS
+const PUBGservers = [
+  "pc-na",
+  "pc-eu",
+  "pc-ru",
+  "pc-krjp",
+  "pc-as",
+  "pc-oc",
+  "pc-sa",
+  "pc-sea",
+  "pc-kakao",
 
-client.on('ready', () => {
+  "xbox-na",
+  "xbox-eu",
+  "xbox-as",
+  "xbox-oc"
+];
+client.PUBGservers = PUBGservers;
 
-  // set status
-  client.user.setStatus("online", `${config.game}`) // Change from settings/config.json
-  console.log('Your Bot is Online')
+
+fs.readdir("./events/", (err, files) => {
+  if (err) return console.error(err);
+  files.forEach(file => {
+    const event = require(`./events/${file}`);
+    let eventName = file.split(".")[0];
+    client.on(eventName, event.bind(null, client));
+  });
 });
 
-client.on("message", async (message) => {
-  // Exit and stop if the prefix is not there or if user is a bot
-  if (!message.content.startsWith(prefix) || message.author.bot) return;
+client.commands = new Enmap();
 
-  if (message.content.startsWith(prefix + "user")) {
-    var pubgargs = message.content.slice(prefix.length).trim().split(/ +/g);
-    const command = pubgargs.shift();
-    let playerName = pubgargs[0];
-    let playerRegion = pubgargs[1];
-    //console.log(`Hello ${message.author.username}, your PUBG Nick is ${playerName} and region is ${playerRegion}`);
-    try {
-      const Player = await pubgClient.getPlayer({
-        name: playerName
-      }, playerRegion);
-      //console.log(Player);
-      const Match = await Player[0].relationships.matches[0].fetch()
-      const Matches = await Player[0].relationships.matches
+fs.readdir("./commands/", (err, files) => {
+  if (err) return console.error(err);
+  files.forEach(file => {
+    if (!file.endsWith(".js")) return;
+    let props = require(`./commands/${file}`);
+    let commandName = file.split(".")[0];
+    //console.log(`Попытка загрузить команду ${commandName}`);
+    client.commands.set(commandName, props);
+  });
+});
+
+// JUST IN CASE OF ANY ERROR OF DISCORD.JS
+client.on("error", (o_O) => {});
+
+// On bot ready function
+client.on('ready', () => {
+
+  // Set status
+  client.user.setStatus("idle") // Set status
+  client.user.setActivity(`${config.game}`) // Set game. Change from settings/config.json
+  console.log('BOT is now online!')
+});
+
+// Sort functions for commands
+
+
+const getObjects = function getObjects(obj, key, val) {
+  var objects = [];
+  for (var i in obj) {
+    if (!obj.hasOwnProperty(i)) continue;
+    if (typeof obj[i] == 'object') {
+      objects = objects.concat(getObjects(obj[i], key, val));
+    } else
+      //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
+      if (i == key && obj[i] == val || i == key && val == '') { //
+        objects.push(obj);
+      } else if (obj[i] == val && key == '') {
+      //only add if the object is not already in the array
+      if (objects.lastIndexOf(obj) == -1) {
+        objects.push(obj);
+      }
+    }
+  }
+  return objects;
+}
+
+const getValues = function getValues(obj, key) {
+  var objects = [];
+  for (var i in obj) {
+    if (!obj.hasOwnProperty(i)) continue;
+    if (typeof obj[i] == 'object') {
+      objects = objects.concat(getValues(obj[i], key));
+    } else if (i == key) {
+      objects.push(obj[i]);
+    }
+  }
+  return objects;
+}
+const SecondsTohhmmss = function(totalSeconds) {
+  var minutes = Math.floor((totalSeconds) / 60);
+  var seconds = totalSeconds - (minutes * 60);
+
+  // round seconds
+  seconds = Math.round(seconds * 100) / 100
+
+  var result = (minutes < 10 ? "0" + minutes : minutes);
+  result += "m " + (seconds < 10 ? "0" + seconds : seconds);
+  result += "s "
+  return result;
+}
+
+const roundUp = function roundUp(num, precision) {
+  if (num != 0 || "NaN") {
+    precision = Math.pow(1, precision)
+    return Math.ceil(num * precision) / precision
+  } else {
+    return num;
+  }
+}
+client.getObjects = getObjects;
+client.getValues = getValues;
+client.SecondsTohhmmss = SecondsTohhmmss;
+client.roundUp = roundUp;
+
+
+setInterval(async function() {
+  var notify = db.get('users')
+    .filter({
+      notify: "true"
+    })
+    .value()
+  // console.log("1");
+  // console.log(notify);
+
+  uid_array = notify.filter(a => a.notify).map(a => a.uid);
+  pubgUser_array = notify.filter(a => a.notify).map(a => a.pubgUser);
+  pubgServer_array = notify.filter(a => a.notify).map(a => a.pubgServer);
+  //console.log(uid_array);
+  for (var i = 0, l = notify.length; i < l; i++) {
+    var n_uid = uid_array[i];
+    var n_pubgUser = pubgUser_array[i];
+    var n_pubgServer = pubgServer_array[i];
+    // console.log(n_uid);
+    // console.log(n_pubgUser);
+    // console.log(n_pubgServer);
+    var Player = await pubgClient.getPlayer({
+      name: n_pubgUser
+    }, n_pubgServer);
+    var Match = await Player.relationships.matches[0].fetch()
+    var lastmatch = Match.id;
+    var checkmatch = db.get('users')
+      .find({
+        uid: n_uid
+      })
+      .write()
+    var oldmatch = checkmatch.lastmatch;
+    if (lastmatch != oldmatch) {
+      // console.log("HE NEEEEEEEEEEEEEED GET THIS MATCH");
+      var userObject = getObjects(Match, '', n_pubgUser);
+      var username = getValues(userObject, 'name');
+      var winPlace = getValues(userObject, 'winPlace');
+      var kills = getValues(userObject, 'kills');
+      var totalDamage = getValues(userObject, 'kills');
+      var timeSurvived = getValues(userObject, 'timeSurvived');
+      var boosts = getValues(userObject, 'boosts');
+      var heals = getValues(userObject, 'heals');
+      var assists = getValues(userObject, 'assists');
+      var revives = getValues(userObject, 'revives');
+      var traveledOnCar = getValues(userObject, 'rideDistance');
+      var traveledOnWalk = getValues(userObject, 'walkDistance');
+      var traveledOnWalk = getValues(userObject, 'walkDistance');
+
+      var teammatesObject = getObjects(Match, 'winPlace', winPlace);
+      var teammatesName = getValues(teammatesObject, 'name');
+      // console.log(teammatesName);
       //console.log(Matches.length);
       const playerEmbed = new Discord.RichEmbed()
         .setTitle("Game statistics about player:")
-        .setAuthor(playerName, "https://i.imgur.com/O8Q7Eqq.png")
+        .setAuthor(n_pubgUser, "https://i.imgur.com/O8Q7Eqq.png")
         .setColor("#f7c121")
         .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
         .setThumbnail("https://i.imgur.com/4NHuKRX.png")
         .setTimestamp()
-        .addBlankField(true)
         .addField("Last played match:", `**${Match.attributes.duration}** seconds in **${Match.attributes.gameMode}** gamemode.`, false)
-        .addField("Total matches played:", `${Matches.length}`, true)
-      //console.log("embed passed");
-      await message.channel.send(`${message.author.toString()}, stats about **${Player[0].attributes.name}**`, playerEmbed);
-    } catch (err) {
-      console.log(err)
-      await message.channel.send(`Sorry ${message.author.toString()}, not enough arguments. See commands: **$help**`);
-    }
-  } else
-  if (message.content.startsWith(prefix + "matchlist")) {
-    var pubgargs = message.content.slice(prefix.length).trim().split(/ +/g);
-    try {
-      const command = pubgargs.shift();
-      let playerName = pubgargs[0];
-      let playerRegion = pubgargs[1];
-      const Player = await pubgClient.getPlayer({
-        name: playerName
-      }, playerRegion);
-      //console.log(Player);
-      const Match = await Player[0].relationships.matches
-      //console.log(Match);
-
-      const matchlistEmbed = new Discord.RichEmbed()
-        .setTitle("List of matches:")
-        .setAuthor(playerName, "https://i.imgur.com/O8Q7Eqq.png")
-        .setColor("#f7c121")
-        .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
-        .setThumbnail("https://i.imgur.com/4NHuKRX.png")
-        .setTimestamp()
         .addBlankField(true)
-      for(var i = 0, l = Match.length; i < l; i++) {
-          var msg = Match[i];
-          matchlistEmbed.addField(i, `${msg.id}`, false)
-      }
-
-      //console.log("embed passed");
-      //console.log(matchlistEmbed);
-
-      await message.channel.send(`${message.author.toString()}, match lists of **${Player[0].attributes.name}**`, matchlistEmbed);
-    } catch (err) {
-      console.log(err)
-      await message.channel.send(`Sorry ${message.author.toString()}, not enough arguments. See commands: **$help**`);
-    }
-  } else
-  if (message.content.startsWith(prefix + "help")) {
-
-    const helpEmbed = new Discord.RichEmbed()
-      .setTitle("PUBG BOT help")
-      .setColor("#f7c121")
-      .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
-      .setTimestamp()
-      .addField("Servers:", "pc-na - [North America]\npc-eu - [Europe]\npc-as - [Asia]\npc-oc - [Oceania]\npc-sa - [South and Central America]\npc-sea - [South East Asia]\npc-kakao - [Kakaogames]\n---\nxbox-na - [North America]\nxbox-eu - [Europe]\nxbox-as - [Asia]\nxbox-oc - [Oceania]", false)
-      .addField("User info:", "__$user NickName Server__\n[EXAMPLE: ``$user Jengas pc-eu``]", true)
-      .addField("Match list:", "__$matchlist NickName Server__\n[EXAMPLE: ``$machlist Jengas pc-eu``]", true)
-      .addField("Match info:", "__$matchinfo MatchID Server__\n[EXAMPLE: ``$match bde780c3-8887-4c11-aa50-0165d02aa7b0 pc-eu``]", true)
-
-    await message.channel.send(`${message.author.toString()}, your help is delivered!`, helpEmbed);
-  } else
-  if (message.content.startsWith(prefix + "matchinfo")) {
-    var pubgargs = message.content.slice(prefix.length).trim().split(/ +/g);
-    try {
-      const command = pubgargs.shift();
-      let matchID = pubgargs[0];
-      let playerRegion = pubgargs[1];
-      const Match = await pubgClient.getMatch(matchID, playerRegion);
-      //console.log(Match);
-      const matchEmbed = new Discord.RichEmbed()
-        .setTitle("Match info:")
-        .setColor("#f7c121")
-        .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
-        .setThumbnail("https://i.imgur.com/4NHuKRX.png")
-        .setTimestamp()
         .addBlankField(true)
-        .addField("Created at:", `${Match.attributes.createdAt}`, true)
-        .addField("Server:", `${Match.attributes.shardId}`, true)
-        .addField("Gamemode:", `${Match.attributes.gameMode}`, true)
-        .addField("Duration:", `${Match.attributes.duration}`, true)
-
-      await message.channel.send(`${message.author.toString()}, stats about **${Match.id}**`, matchEmbed);
-    } catch (err) {
-      console.log(err)
-      await message.channel.send(`Sorry ${message.author.toString()}, not enough arguments. See commands: **$help**`);
+        .addField("Gamemode:", `${Match.attributes.gameMode.toUpperCase()}`, true)
+        .addField("Teammates:", `${teammatesName}`.replace(/,\s?/g, "\n"), true)
+        .addField("Rank:", `${winPlace}`, true)
+        .addField("Time Survived:", `${SecondsTohhmmss(timeSurvived)}`, true)
+        .addField("Kills:", `${kills}`, true)
+        .addField("Assists:", `${assists} times`, true)
+        .addField("Total Damage:", `${totalDamage} hp`, true)
+        .addField("Revives:", `${revives}`, true)
+        .addField("Used heals:", `${heals}`, true)
+        .addField("Used boosts:", `${boosts}`, true)
+        .addField("Assists:", `${assists} times`, true)
+        .addField("Traveled on car:", `${roundUp(traveledOnCar, 1)} m`, true)
+        .addField("Walked:", `${roundUp(traveledOnWalk, 1)} m`, true)
+      await client.users.get(n_uid).send(`Your lastest stats about match:`, playerEmbed);
+    } else {
+      // console.log("HE DONT NEEEEEEEEEEED GET NOOOOOO");
+      return;
     }
+    db.get('users')
+      .find({
+        uid: n_uid
+      })
+      .assign({
+        lastmatch: lastmatch
+      })
+      .write()
+    // console.log("Assigned last match");
   }
-});
 
-//Login to your bot edit the config file on settings folder
-client.login(config.discordtoken); // Find your token > https://discordapp.com/developers/applications/me
+}, 300 * 1000);
+
+
+// Login to Discord API
+client.login(config.token);
