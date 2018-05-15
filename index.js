@@ -169,8 +169,7 @@ setInterval(async function() {
     try {
       var Match = await pubgClient.getMatch(getMatch.id);
     } catch (e) {
-      await message.channel.send(`${message.author.toString()}, this player hasn't played PUBG yet.`);
-      return;
+      continue;
     }
     var lastmatch = Match.id;
     var checkmatch = db.get('users')
