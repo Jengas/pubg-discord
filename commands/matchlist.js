@@ -17,7 +17,6 @@ exports.run = async (client, message, args) => {
       name: playerName
     }, playerRegion);
     const Match = await Player.relationships.matches
-	console.log(Match);
 
     const matchlistEmbed = new Discord.RichEmbed()
       .setTitle("List of matches:")
