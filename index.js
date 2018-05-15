@@ -165,7 +165,13 @@ setInterval(async function() {
     var Player = await pubgClient.getPlayer({
       name: n_pubgUser
     }, n_pubgServer);
-    var Match = await Player.relationships.matches[0].fetch()
+    var getMatch = await Player.relationships.matches[0]
+    try {
+      var Match = await pubgClient.getMatch(getMatch.id);
+    } catch (e) {
+      await message.channel.send(`${message.author.toString()}, this player hasn't played PUBG yet.`);
+      return;
+    }
     var lastmatch = Match.id;
     var checkmatch = db.get('users')
       .find({

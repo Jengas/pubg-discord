@@ -29,7 +29,13 @@ exports.run = async (client, message, args) => {
       name: playerName
     }, playerRegion);
     //console.log(Player);
-    var Match = await Player.relationships.matches[0].fetch()
+    var getMatch = await Player.relationships.matches[0]
+    try {
+      var Match = await pubgClient.getMatch(getMatch.id);
+    } catch (e) {
+      await message.channel.send(`${message.author.toString()}, this player hasn't played PUBG yet.`);
+      return;
+    }
     var Matches = await Player.relationships.matches
     console.log(`${Match.id}`);
     console.log(Player);

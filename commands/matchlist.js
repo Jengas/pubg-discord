@@ -17,6 +17,7 @@ exports.run = async (client, message, args) => {
       name: playerName
     }, playerRegion);
     const Match = await Player.relationships.matches
+	console.log(Match);
 
     const matchlistEmbed = new Discord.RichEmbed()
       .setTitle("List of matches:")
@@ -28,8 +29,11 @@ exports.run = async (client, message, args) => {
       .addBlankField(true)
     for (var i = 0; i < 20; i++) {
       var msg = Match[i];
-      matchlistEmbed.addField(i + 1, "```fix\n" + msg.id + "\n```", false)
       console.log(msg);
+  	  if (msg == null) {
+  		  continue;
+  	  }
+      matchlistEmbed.addField(i + 1, "```fix\n" + msg.id + "\n```", false)
     }
 
     await message.channel.send(`${message.author.toString()}, match lists of **${Player.attributes.name}**`, matchlistEmbed);
