@@ -221,7 +221,13 @@ setInterval(async function() {
         .addField("Assists:", `${assists} times`, true)
         .addField("Traveled on car:", `${roundUp(traveledOnCar, 1)} m`, true)
         .addField("Walked:", `${roundUp(traveledOnWalk, 1)} m`, true)
-      await client.users.get(n_uid).send(`Your lastest stats about match:`, playerEmbed);
+        try {
+          await client.users.get(n_uid).send(`Your lastest stats about match:`, playerEmbed);
+        } catch (e) {
+          console.log(e);
+        } finally {
+          continue;
+        }
     } else {
       // console.log("HE DONT NEEEEEEEEEEED GET NOOOOOO");
     }
