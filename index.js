@@ -224,8 +224,6 @@ setInterval(async function() {
         try {
           await client.users.get(n_uid).send(`Your lastest stats about match:`, playerEmbed);
         } catch (e) {
-          console.log(e);
-        } finally {
           continue;
         }
     } else {
