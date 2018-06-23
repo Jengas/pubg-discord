@@ -179,7 +179,7 @@ setInterval(async function() {
       .write()
     var oldmatch = checkmatch.lastmatch;
     if (lastmatch != oldmatch) {
-       // console.log("HE NEEEEEEEEEEEEEED GET THIS MATCH");
+      // console.log("HE NEEEEEEEEEEEEEED GET THIS MATCH");
       var userObject = getObjects(Match, '', n_pubgUser);
       var username = getValues(userObject, 'name');
       var winPlace = getValues(userObject, 'winPlace');
@@ -221,11 +221,11 @@ setInterval(async function() {
         .addField("Assists:", `${assists} times`, true)
         .addField("Traveled on car:", `${roundUp(traveledOnCar, 1)} m`, true)
         .addField("Walked:", `${roundUp(traveledOnWalk, 1)} m`, true)
-        try {
-          await client.users.get(n_uid).send(`Your lastest stats about match:`, playerEmbed);
-        } catch (e) {
-          continue;
-        }
+      try {
+        await client.users.get(n_uid).send(`Your lastest stats about match:`, playerEmbed);
+      } catch (e) {
+        continue;
+      }
     } else {
       // console.log("HE DONT NEEEEEEEEEEED GET NOOOOOO");
     }
