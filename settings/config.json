@@ -1,5 +1,25 @@
 {
-  "prefix": "$",
-  "token": "yoursupertokenhere",
+  "prefix": ".",
+  "token": "YourDiscordToken",
   "game": "solo ffp",
-  "pubgtoken": "putpubg.tokenhere"
+  "pubg": {
+    "pubgtoken": "YourPUBGToken",
+    "PUBGservers": [
+      "pc-na",
+      "pc-eu",
+      "pc-ru",
+      "pc-krjp",
+      "pc-as",
+      "pc-oc",
+      "pc-sa",
+      "pc-sea",
+      "pc-kakao",
+
+      "xbox-na",
+      "xbox-eu",
+      "xbox-as",
+      "xbox-oc"
+    ],
+    "notify_interval": 200
+  }
+}

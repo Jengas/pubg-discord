@@ -1,6 +1,7 @@
 exports.run = async (client, message, args) => {
 
   const Discord = client.Discord;
+  const logger = client.logger;
   const pubgClient = client.pubgClient;
   const getObjects = client.getObjects;
   const getValues = client.getValues;
@@ -12,11 +13,11 @@ exports.run = async (client, message, args) => {
     let matchID = args[1];
 
     if (typeof playerName == 'undefined') {
-      await message.channel.send(`Sorry ${message.author.toString()}, you haven't specified player name or match id. See commands: **${client.config.prefix}help**`);
+      await message.reply(`you haven't specified player name or match id. See commands: **${client.config.prefix}help**`);
       return;
     } else
     if (typeof matchID == 'undefined') {
-      await message.channel.send(`Sorry ${message.author.toString()}, you haven't specified match id or player name. See commands: **${client.config.prefix}help**`);
+      await message.reply(`you haven't specified match id or player name. See commands: **${client.config.prefix}help**`);
       return;
     }
     const Match = await pubgClient.getMatch(matchID);
@@ -66,10 +67,10 @@ exports.run = async (client, message, args) => {
       .addField("Walked:", `${roundUp(traveledOnWalk, 1)} m`, true)
 
     await message.channel.send(`${message.author.toString()}, stats about **${Match.id}**`, matchEmbed);
-    console.log(`${message.author.tag} (${message.author.id}) - executed command $matchinfo`);
+    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
   } catch (err) {
     console.log(err)
-    await message.channel.send(`Sorry ${message.author.toString()}, wrong arguments. See commands: **${client.config.prefix}help**`);
-    console.log(`${message.author.tag} (${message.author.id}) - executed command $matchinfo wrongly`);
+    await message.reply(`wrong arguments. See commands: **${client.config.prefix}help**`);
+    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
   }
 }
