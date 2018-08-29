@@ -1,71 +1,61 @@
 exports.run = async (client, message, args) => {
 
-  const low = client.low;
-  const FileSync = client.FileSync;
-  const adapter = client.adapter;
-  const db = client.db;
+  const Discord = client.Discord;
+  const dbsql = client.dbsql;
+  const logger = client.logger;
+  const pubgClient = client.pubgClient;
   const PUBGservers = client.PUBGservers;
 
   let pubgUser = args[0];
   let pubgServer = args[1];
 
-  if (!PUBGservers.includes(pubgServer)) {
-    await message.channel.send(`${message.author.toString()}, server you specified doesn't exists.`);
-    return;
-  }
 
-  if (typeof pubgUser == 'undefined') {
-    await message.channel.send(`${message.author.toString()}, you haven't added PUBG user account.`);
-    return;
-  } else
-  if (typeof pubgServer == 'undefined') {
-    await message.channel.send(`${message.author.toString()}, you haven't added PUBG server.`);
-    return;
-  } else
-  if (typeof pubgUser == 'undefined' || typeof pubgServer == 'undefined') {
-    await message.channel.send(`${message.author.toString()}, you haven't added PUBG user account and server.`);
-    return;
-  }
+  var GetUserCheck = dbsql.prepare('SELECT userid, pubgUser FROM users WHERE userid=?').get(message.author.id)
 
-  db.defaults({
-      users: []
-    })
-    .write()
-
-  try {
-    var nuid = db.get('users')
-      .find({
-        uid: message.member.id
-      })
-      .value()
-
-    if (nuid.uid == message.member.id) {
-      db.get('users')
-        .find({
-          uid: message.member.id
-        })
-        .assign({
-          pubgUser: pubgUser,
-          pubgServer: pubgServer,
-          notify: "false",
-        })
-        .write()
-      console.log(`${message.author.tag} (${message.author.id}) - updated his PUBG data for Database`);
-      await message.channel.send(`${message.author.toString()}, you have successfully added new PUBG username **${pubgUser}** and server **${pubgServer}**`);
+  message.reply("to add your PUBG account to the Discord, enter your PUBG name");
+  const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, {
+    time: 60 * 1000
+  });
+  var list_array = [];
+  collector.on('collect', async (message) => {
+    list_array.push(message.content)
+    var serversEmbed = new Discord.RichEmbed()
+      .setColor("#f7c121")
+    for (var i = 0; i < PUBGservers.length; i++) {
+      var server_list = server_list + "\n" + PUBGservers[i];
     }
-    console.log(nuid);
-  } catch (e) {
-    console.log("No user! Creating...")
-    db.get('users')
-      .push({
-        uid: message.member.id,
-        pubgUser: pubgUser,
-        pubgServer: pubgServer,
-        notify: "false",
-        lastmatch: "null"
-      })
-      .write()
-    console.log(`${message.author.tag} (${message.author.id}) - executed command $addaccount`);
-    await message.channel.send(`${message.author.toString()}, you have successfully added new PUBG username **${pubgUser}**`);
-  }
+    var server_list = server_list.replace("undefined", "");
+    serversEmbed.addField('Servers', server_list, false)
+    if (!PUBGservers.includes(message.content)) {
+      message.channel.send(`${message.author.toString()}, specify the server you are playing on. Servers:`, serversEmbed);
+    }
+    if (PUBGservers.includes(message.content)) {
+      list_array.push(message.content)
+      try {
+        const Player = await pubgClient.getPlayer({
+            name: list_array[0]
+          })
+          .then(player => player)
+          .catch(error => console.log(error))
+        var user_try = Player.attributes.name;
+
+        if (GetUserCheck == undefined) {
+          dbsql.prepare('INSERT INTO users (userid, pubgUser, pubgServer) VALUES (?, ?, ?)').run(message.author.id, list_array[0], list_array[list_array.length-1])
+          logger.info(`${message.author.tag} added the account with the nickname PUBG ${list_array[0]} to database`);
+        } else {
+          dbsql.prepare('UPDATE users SET pubgUser = ?, pubgServer = ? WHERE userid=?').run(list_array[0], list_array[list_array.length-1], message.author.id)
+          logger.info(`${message.author.tag} changed your PUBG account with nick ${list_array[0]} to database`);
+        }
+
+        message.reply("great! You have successfully linked your PUBG account to Discord")
+        collector.stop()
+      } catch (e) {
+        message.reply("you may have entered the wrong nickname in PUBG. Try again!");
+        collector.stop()
+      }
+    }
+  })
+  await message.delete()
+    .then(msg => logger.info(`${message.author.tag} (${message.author.id}) - execute the command ${__filename.split(/[\\/]/).pop().split(".")[0]}`))
+    .catch(console.error);
 }
