@@ -1,16 +1,17 @@
 exports.run = async (client, message, args) => {
   const Discord = client.Discord;
+  const logger = client.logger;
   const pubgClient = client.pubgClient;
 
   try {
     let playerName = args[0];
     let playerRegion = args[1];
     if (typeof playerName == 'undefined') {
-      await message.channel.send(`Sorry ${message.author.toString()}, you haven't specified player name. See commands: **${client.config.prefix}help**`);
+      await message.reply(`you haven't specified player name. See commands: **${client.config.prefix}help**`);
       return;
     } else
     if (typeof playerRegion == 'undefined') {
-      await message.channel.send(`Sorry ${message.author.toString()}, you haven't specified server region. See commands: **${client.config.prefix}help**`);
+      await message.reply(`you haven't specified server region. See commands: **${client.config.prefix}help**`);
       return;
     }
     const Player = await pubgClient.getPlayer({
@@ -28,18 +29,16 @@ exports.run = async (client, message, args) => {
       .addBlankField(true)
     for (var i = 0; i < 20; i++) {
       var msg = Match[i];
-      console.log(msg);
   	  if (msg == null) {
   		  continue;
   	  }
       matchlistEmbed.addField(i + 1, "```fix\n" + msg.id + "\n```", false)
     }
 
-    await message.channel.send(`${message.author.toString()}, match lists of **${Player.attributes.name}**`, matchlistEmbed);
-    console.log(`${message.author.tag} (${message.author.id}) - executed command $matchlist`);
+    await message.channel.send(`${message.author.toString()}, the list of matches of the player **${Player.attributes.name}**`, matchlistEmbed);
+    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
   } catch (err) {
-    console.log(err)
-    console.log(`${message.author.tag} (${message.author.id}) - executed command $matchlist wrongly!`);
-    await message.channel.send(`Sorry ${message.author.toString()}, wrong arguments. See commands: **${client.config.prefix}help**`);
+    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
+    await message.reply(`wrong arguments. See commands: **${client.config.prefix}help**`);
   }
 }

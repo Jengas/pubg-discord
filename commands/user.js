@@ -1,6 +1,7 @@
 exports.run = async (client, message, args) => {
 
   const Discord = client.Discord;
+  const logger = client.logger;
   const pubgClient = client.pubgClient;
   const PUBGservers = client.PUBGservers;
   const getObjects = client.getObjects;
@@ -12,15 +13,15 @@ exports.run = async (client, message, args) => {
   let playerRegion = args[1];
 
   if (typeof playerName == 'undefined') {
-    await message.channel.send(`Sorry ${message.author.toString()}, you haven't specified player name. See commands: **${client.config.prefix}help**`);
+    await message.reply(`you haven't specified player name. See commands: **${client.config.prefix}help**`);
     return;
   } else
   if (typeof playerRegion == 'undefined') {
-    await message.channel.send(`Sorry ${message.author.toString()}, you haven't specified player region. See commands: **${client.config.prefix}help**`);
+    await message.reply(`you haven't specified player region. See commands: **${client.config.prefix}help**`);
     return;
   } else
   if (!PUBGservers.includes(playerRegion)) {
-    await message.channel.send(`${message.author.toString()}, server you specified doesn't exists.`);
+    await message.reply(`server you specified doesn't exists.`);
     return;
   }
 
@@ -28,17 +29,14 @@ exports.run = async (client, message, args) => {
     var Player = await pubgClient.getPlayer({
       name: playerName
     }, playerRegion);
-    //console.log(Player);
     var getMatch = await Player.relationships.matches[0]
     try {
       var Match = await pubgClient.getMatch(getMatch.id);
     } catch (e) {
-      await message.channel.send(`${message.author.toString()}, this player hasn't played PUBG yet.`);
+      await message.reply(`this player has not played PUBG match yet.`);
       return;
     }
     var Matches = await Player.relationships.matches
-    console.log(`${Match.id}`);
-    console.log(Player);
 
     var userObject = getObjects(Match, '', playerName);
     var username = getValues(userObject, 'name');
@@ -82,12 +80,11 @@ exports.run = async (client, message, args) => {
       .addField("Assists:", `${assists} times`, true)
       .addField("Traveled on car:", `${roundUp(traveledOnCar, 1)} m`, true)
       .addField("Walked:", `${roundUp(traveledOnWalk, 1)} m`, true)
-    //console.log("embed passed");
+
     await message.channel.send(`${message.author.toString()}, stats about **${Player.attributes.name}**`, playerEmbed);
-    console.log(`${message.author.tag} (${message.author.id}) - executed command $user`);
+    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
   } catch (err) {
-    console.log(`${message.author.tag} (${message.author.id}) - executed command $user wrongly!`);
-    console.log(err)
-    await message.channel.send(`Sorry ${message.author.toString()}, wrong arguments. See commands: **${client.config.prefix}help**`);
+    await message.reply(`wrong arguments. See commands: **${client.config.prefix}help**`);
+    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
   }
 }

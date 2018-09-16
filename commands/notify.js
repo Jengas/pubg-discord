@@ -1,45 +1,23 @@
 exports.run = async (client, message, args) => {
-  const low = client.low;
-  const FileSync = client.FileSync;
-  const adapter = client.adapter;
-  const db = client.db;
+  const Discord = client.Discord;
+  const dbsql = client.dbsql;
+  const logger = client.logger;
   const PUBGservers = client.PUBGservers;
 
-  try {
-    var nuid = db.get('users')
-      .find({
-        uid: message.member.id
-      })
-      .value()
-  } catch (e) {
-    console.log(e);
-    await message.channel.send(`${message.author.toString()}, you haven't added PUBG user to the bot. Use **${client.config.prefix}addaccount __pubgname__ __pubgserver__**`);
+
+  var nuid = dbsql.prepare("SELECT * FROM users WHERE userid=?").get(message.author.id);
+  if (nuid == undefined) {
+    await message.reply(`you haven't added PUBG user to the bot. Use **${client.config.prefix}addaccount** to link an account`);
     return;
   }
 
-  if (nuid.notify == "false") {
-    db.get('users')
-      .find({
-        uid: message.member.id
-      })
-      .assign({
-        notify: "true"
-      })
-      .write()
-    console.log("NOW YES");
-    await message.channel.send(`${message.author.toString()}, now bot **will** notify your stats after matches!`);
+  if (nuid.notify == "0") {
+    dbsql.prepare("UPDATE users SET notify = ? WHERE userid=?").run("1", message.author.id)
+    await message.reply(`now bot **will** notify your stats after every match!`);
   } else
-  if (nuid.notify == "true") {
-    db.get('users')
-      .find({
-        uid: message.member.id
-      })
-      .assign({
-        notify: "false"
-      })
-      .write()
-    console.log("NOT NO");
-    await message.channel.send(`${message.author.toString()}, now bot **will not** notify your stats after matches!`);
+  if (nuid.notify == "1") {
+    dbsql.prepare("UPDATE users SET notify = ? WHERE userid=?").run("0", message.author.id)
+    await message.reply(`now bot **will not** notify your stats after every match!`);
   }
-
+  logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
 }
