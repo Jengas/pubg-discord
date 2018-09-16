@@ -25,16 +25,13 @@ module.exports = async (client, message) => {
 
   dbsql.prepare('CREATE TABLE IF NOT EXISTS users ( userid TEXT, pubgUser TEXT, pubgServer TEXT, notify TEXT DEFAULT "false", lastmatch TEXT )').run();
 
-  setInterval(async function() {
+  async function checkUsers() {
     var notify = dbsql.prepare('SELECT * FROM users WHERE notify=?').all("1");
 
     for (var i = 0, l = notify.length; i < l; i++) {
       var n_uid = notify[i].userid;
       var n_pubgUser = notify[i].pubgUser;
       var n_pubgServer = notify[i].pubgServer;
-      // console.log(n_uid);
-      // console.log(n_pubgUser);
-      // console.log(n_pubgServer);
       var Player = await pubgClient.getPlayer({
         name: n_pubgUser
       }, n_pubgServer);
@@ -96,6 +93,10 @@ module.exports = async (client, message) => {
       dbsql.prepare('UPDATE users SET lastmatch = ? WHERE userid = ?').run(lastmatch, n_uid)
     }
 
+  }
+
+  setInterval(async function() {
+    checkUsers();
   }, client.config.pubg.notify_interval * 1000);
 
 };
