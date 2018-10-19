@@ -6,7 +6,8 @@
     "PUBG"
   ],
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "nodemon index.js"
   },
   "contributors": [
     {
@@ -16,11 +17,12 @@
     }
   ],
   "dependencies": {
-    "better-sqlite3": "^4.1.4",
+    "better-sqlite3": "^4.2.0",
     "discord.js": "^11.4.2",
     "enmap": "^2.7.2",
-    "log4js": "^3.0.4",
-    "pubg.js": "^3.6.0"
+    "jimp": "^0.5.4",
+    "log4js": "^3.0.6",
+    "pubg.js": "^3.7.2"
   },
   "homepage": "https://github.com/Jengas/pubg-discord"
 }

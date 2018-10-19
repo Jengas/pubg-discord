@@ -19,6 +19,10 @@ var dbsql = new Database('./data/data.db');
 client.Database = Database;
 client.dbsql = dbsql;
 
+// Graphics
+const Jimp = require('jimp');
+client.Jimp = Jimp;
+
 // PUBG CLIENT
 const pubg = require('pubg.js');
 const pubgClient = new pubg.Client(config.pubg.pubgtoken);
@@ -50,12 +54,27 @@ client.log4js = log4js;
 client.logger = logger;
 
 
+const lang = {};
+
+fs.readdir("./data/lang/", (err, files) => {
+  if (err) return console.error(err);
+  files.forEach(file => {
+    let fileName = file.split(".")[0];
+    lang[fileName] = require(`./data/lang/${fileName}.json`);
+  });
+});
+client.lang = lang;
+
 fs.readdir("./events/", (err, files) => {
   if (err) return console.error(err);
   files.forEach(file => {
     const event = require(`./events/${file}`);
     let eventName = file.split(".")[0];
-    client.on(eventName, event.bind(null, client));
+    if (eventName == 'ready') {
+      client.once(eventName, event.bind(null, client));
+    } else {
+      client.on(eventName, event.bind(null, client));
+    }
   });
 });
 
@@ -67,7 +86,6 @@ fs.readdir("./commands/", (err, files) => {
     if (!file.endsWith(".js")) return;
     let props = require(`./commands/${file}`);
     let commandName = file.split(".")[0];
-    //console.log(`Попытка загрузить команду ${commandName}`);
     client.commands.set(commandName, props);
   });
 });
@@ -107,7 +125,8 @@ const getValues = function getValues(obj, key) {
   }
   return objects;
 }
-const SecondsTohhmmss = function(totalSeconds) {
+
+const secondsTohhmmss = function (totalSeconds) {
   var minutes = Math.floor((totalSeconds) / 60);
   var seconds = totalSeconds - (minutes * 60);
 
@@ -128,9 +147,11 @@ const roundUp = function roundUp(num, precision) {
     return num;
   }
 }
+
+
 client.getObjects = getObjects;
 client.getValues = getValues;
-client.SecondsTohhmmss = SecondsTohhmmss;
+client.secondsTohhmmss = secondsTohhmmss;
 client.roundUp = roundUp;
 
 
