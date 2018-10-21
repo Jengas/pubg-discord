@@ -1,7 +1,7 @@
 # PUBG Discord bot
 **PUBG Bot** for **Discord** servers.
 
-###Features
+### Features
 
 - Show stats about your match;
 - Show list of matches that you have played;
@@ -9,7 +9,7 @@
 - Change language of bot in your server;
 - **Soon More!**
 
-###How to install
+### How to install
 
 1. Install node.js from [NodeJS](https://nodejs.org) [https://nodejs.org](https://nodejs.org)
 2. Download Repository: `git clone https://github.com/Jengas/pubg-discord.git` Or just download zip
@@ -18,7 +18,7 @@
 5. Fill the [config file](https://github.com/Jengas/pubg-discord/settings/config.json) /settings/config.json
 6. Run the bot! `node index.js`
 
-###Server shards
+### Server shards
 <table>
 <tbody>
 <tr>
@@ -64,7 +64,7 @@
 </tbody>
 </table>
 
-###Commands
+### Commands
 <table>
 <tbody>
 <tr>
