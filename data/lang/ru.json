@@ -25,7 +25,7 @@
     "successaccchange": "отлично! Вы успешно привязали PUBG аккаунт к Discord",
     "wrongaccname": "возможно вы указали неверный ник в PUBG. Попробуйте еще раз!",
     "execcmd": "выполнил команду",
-    "accnotlinked": "вы не добавили пользователя PUBG к боту. Используйте **${client.config.prefix}addaccount** чтобы привязать аккаунт",
+    "accnotlinked": "вы не добавили пользователя PUBG к боту. Используйте",
     "hasntplayed": "этот игрок еще не играл PUBG.",
     "commands": "команды",
     "addpubgacc": "Добавить учетную запись PUBG",
@@ -60,5 +60,6 @@
     "listofmatches_1": "Список матчей",
     "min": "МИН",
     "meters_singular": "М",
-    "swum": "Проплыл"
+    "swum": "Проплыл",
+    "tolinkaccount": "чтобы привязать аккаунт"
 }

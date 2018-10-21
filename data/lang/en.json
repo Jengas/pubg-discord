@@ -25,7 +25,7 @@
     "successaccchange": "great! You have successfully linked your PUBG account to Discord",
     "wrongaccname": "you may have entered the wrong nickname in PUBG. Try again!",
     "execcmd": "executed the command",
-    "accnotlinked": "you have not linked your PUBG account to the bot. Use **${client.config.prefix}addaccount** to link an account",
+    "accnotlinked": "you have not linked your PUBG account to the bot. Use",
     "hasntplayed": "this player has not played PUBG match yet.",
     "commands": "commands",
     "addpubgacc": "Add PUBG account",
@@ -60,5 +60,6 @@
     "listofmatches_1": "List of mathes",
     "min": "MIN",
     "meters_singular": "M",
-    "swum": "Swum"
+    "swum": "Swum",
+    "tolinkaccount": "to link an account"
 }

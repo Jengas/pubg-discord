@@ -15,7 +15,7 @@ exports.run = async (client, message, args) => {
 
   var nuid = dbsql.prepare("SELECT * FROM users WHERE userid=?").get(message.author.id);
   if (nuid == undefined) {
-    await message.reply(lng.accnotlinked);
+    await message.reply(`${lng.accnotlinked} **${client.config.prefix}addaccount** ${lng.tolinkaccount}`);
     return;
   }
 
