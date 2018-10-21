@@ -455,7 +455,7 @@ exports.run = async (client, message, args) => {
                     oswald_orange_48,
                     560,
                     490, {
-                        text: `${swimDistance}`,
+                        text: `${Math.ceil(swimDistance)}`,
                         alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
                     },
                     200
