@@ -1,6 +1,8 @@
 # PUBG Discord bot
 **PUBG Bot** for **Discord** servers.
 
+[![GitHub license](https://img.shields.io/github/license/Jengas/pubg-discord.svg)](https://github.com/Jengas/pubg-discord/blob/master/LICENSE)
+
 ### Features
 
 - Show stats about your match;
