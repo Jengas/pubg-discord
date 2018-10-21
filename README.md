@@ -91,5 +91,9 @@
 <td>Get stats every match</td>
 <td><code>$notify</code></td>
 </tr>
+<tr>
+<td>Bot server config</td>
+<td><code>$bce</code></td>
+</tr>
 </tbody>
 </table>
