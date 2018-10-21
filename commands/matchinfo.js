@@ -1,76 +1,469 @@
 exports.run = async (client, message, args) => {
 
-  const Discord = client.Discord;
-  const logger = client.logger;
-  const pubgClient = client.pubgClient;
-  const getObjects = client.getObjects;
-  const getValues = client.getValues;
-  const SecondsTohhmmss = client.SecondsTohhmmss;
-  const roundUp = client.roundUp;
+    const Discord = client.Discord;
+    const logger = client.logger;
+    const pubgClient = client.pubgClient;
+    const dbsql = client.dbsql;
+    const getObjects = client.getObjects;
+    const getValues = client.getValues;
+    const secondsTohhmmss = client.secondsTohhmmss;
+    const roundUp = client.roundUp;
+    const lang = client.lang;
+    const Jimp = client.Jimp;
 
-  try {
-    let playerName = args[0];
-    let matchID = args[1];
+    var serverData = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id)
 
-    if (typeof playerName == 'undefined') {
-      await message.reply(`you haven't specified player name or match id. See commands: **${client.config.prefix}help**`);
-      return;
-    } else
-    if (typeof matchID == 'undefined') {
-      await message.reply(`you haven't specified match id or player name. See commands: **${client.config.prefix}help**`);
-      return;
+    if (serverData.language == 'ru') {
+        var lng = lang.ru;
+    } else {
+        var lng = lang.en;
     }
-    const Match = await pubgClient.getMatch(matchID);
 
-    var userObject = getObjects(Match, '', playerName);
-    var username = getValues(userObject, 'name');
-    var winPlace = getValues(userObject, 'winPlace');
-    var kills = getValues(userObject, 'kills');
-    var totalDamage = getValues(userObject, 'kills');
-    var timeSurvived = getValues(userObject, 'timeSurvived');
-    var boosts = getValues(userObject, 'boosts');
-    var heals = getValues(userObject, 'heals');
-    var assists = getValues(userObject, 'assists');
-    var revives = getValues(userObject, 'revives');
-    var traveledOnCar = getValues(userObject, 'rideDistance');
-    var traveledOnWalk = getValues(userObject, 'walkDistance');
-    var traveledOnWalk = getValues(userObject, 'walkDistance');
+    try {
+        let playerName = args[0];
+        let matchID = args[1];
 
-    var teammatesObject = getObjects(Match, 'winPlace', winPlace);
-    var teammatesName = getValues(teammatesObject, 'name');
-    //console.log(Match);
-    const matchEmbed = new Discord.RichEmbed()
-      .setTitle("Match info:")
-      .setColor("#f7c121")
-      .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
-      .setThumbnail("https://i.imgur.com/4NHuKRX.png")
-      .setTimestamp()
-      .addField("User:", `${username}`, false)
-      .addBlankField(true)
+        if (typeof playerName == 'undefined') {
+            await message.reply(`${lng.namenotspecified}: **${client.config.prefix}help**`);
+            return;
+        } else
+        if (typeof matchID == 'undefined') {
+            await message.reply(`${lng.servernotspecified}: **${client.config.prefix}help**`);
+            return;
+        }
+        const Match = await pubgClient.getMatch(matchID);
 
-      .addField("Created at:", `${Match.attributes.createdAt}`, true)
-      .addField("Server:", `${Match.attributes.shardId.toUpperCase()}`, true)
-      .addField("Gamemode:", `${Match.attributes.gameMode.toUpperCase()}`, true)
-      .addField("Duration:", `${Match.attributes.duration}`, false)
-      .addBlankField(true)
-      .addBlankField(true)
-      .addField("Teammates:", `${teammatesName}`.replace(/,\s?/g, "\n"), true)
-      .addField("Rank:", `${winPlace}`, true)
-      .addField("Time Survived:", `${SecondsTohhmmss(timeSurvived)}`, true)
-      .addField("Kills:", `${kills}`, true)
-      .addField("Assists:", `${assists} times`, true)
-      .addField("Total Damage:", `${totalDamage} hp`, true)
-      .addField("Revives:", `${revives}`, true)
-      .addField("Used heals:", `${heals}`, true)
-      .addField("Used boosts:", `${boosts}`, true)
-      .addField("Traveled on car:", `${roundUp(traveledOnCar, 1)} m`, true)
-      .addField("Walked:", `${roundUp(traveledOnWalk, 1)} m`, true)
+        var userObject = getObjects(Match, '', playerName);
 
-    await message.channel.send(`${message.author.toString()}, stats about **${Match.id}**`, matchEmbed);
-    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
-  } catch (err) {
-    console.log(err)
-    await message.reply(`wrong arguments. See commands: **${client.config.prefix}help**`);
-    logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
-  }
+        var winPlace = getValues(userObject, 'winPlace');
+        var kills = getValues(userObject, 'kills');
+        var totalDamage = getValues(userObject, 'damageDealt');
+        var timeSurvived = getValues(userObject, 'timeSurvived');
+        var boosts = getValues(userObject, 'boosts');
+        var heals = getValues(userObject, 'heals');
+        var assists = getValues(userObject, 'assists');
+        var revives = getValues(userObject, 'revives');
+        var traveledOnCar = getValues(userObject, 'rideDistance');
+        var traveledOnWalk = getValues(userObject, 'walkDistance');
+        var swimDistance = getValues(userObject, 'swimDistance');
+
+        var teammatesObject = getObjects(Match, 'winPlace', winPlace);
+        var teammatesName = getValues(teammatesObject, 'name');
+
+        async function genStats() {
+            var oswald_white_24 = await Jimp.loadFont(`./data/fonts/oswald/oswald_white_24.fnt`);
+            var oswald_orange_32 = await Jimp.loadFont(`./data/fonts/oswald/oswald_orange_32.fnt`);
+            var oswald_orange_48 = await Jimp.loadFont(`./data/fonts/oswald/oswald_orange_48.fnt`);
+            var oswald_black_15 = await Jimp.loadFont(`./data/fonts/oswald/oswald_black_15.fnt`);
+            var oswald_black_36 = await Jimp.loadFont(`./data/fonts/oswald/oswald_black_36.fnt`);
+
+
+            if (teammatesName.length == 1) {
+                var tm_font = oswald_black_15
+                var tm_x = 300
+                var tm_y = 140
+                var tm_maxwidth = 200
+                var tm_aligment = Jimp.HORIZONTAL_ALIGN_CENTER
+                var tm_text = teammatesName.join(' ');
+            } else
+            if (teammatesName.length == 2) {
+                var tm_font = oswald_black_15
+                var tm_x = 390
+                var tm_y = 110
+                var tm_maxwidth = 25
+                var tm_aligment = Jimp.HORIZONTAL_ALIGN_CENTER
+                var tm_text = teammatesName.join(' ');
+            } else
+            if (teammatesName.length >= 3) {
+                var tm_font = oswald_black_15
+                var tm_x = 390
+                var tm_y = 88
+                var tm_maxwidth = 25
+                var tm_aligment = Jimp.HORIZONTAL_ALIGN_CENTER
+                var tm_text = teammatesName.join(' ');
+            }
+
+
+            const image = await Jimp.read('./data/images/bg.png');
+
+            var img = image.print(
+                    // Username
+                    oswald_orange_32,
+                    30,
+                    6, {
+                        text: `${Player.attributes.name}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
+                        alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
+                    }
+                ).print(
+                    // Server info
+                    oswald_white_24,
+                    358,
+                    -4, {
+                        text: `${Match.attributes.shardId.toUpperCase()} ${Match.attributes.gameMode.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_RIGHT
+                    },
+                    400
+                ).print(
+                    // Date
+                    oswald_white_24,
+                    358,
+                    22, {
+                        text: `${Match.attributes.createdAt.toGMTString().split(' ').slice(0, 6).join(' ')}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_RIGHT
+                    },
+                    400
+                ).print(
+                    // Rank title
+                    oswald_white_24,
+                    43,
+                    75, {
+                        text: `${lng.rank}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Rank data
+                    oswald_orange_48,
+                    40,
+                    120, {
+                        text: `#${winPlace}/100`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Rank title
+                    oswald_white_24,
+                    304,
+                    75, {
+                        text: `${lng.teammates}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Rank data
+                    tm_font,
+                    tm_x,
+                    tm_y, {
+                        text: `${tm_text}`,
+                        alignmentX: tm_aligment
+                    },
+                    tm_maxwidth
+                )
+                .print(
+                    // Survived title
+                    oswald_white_24,
+                    570,
+                    75, {
+                        text: `${lng.timesurvived}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Survived data
+                    oswald_orange_48,
+                    560,
+                    100, {
+                        text: `${Math.floor(timeSurvived / 60)}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Survived metrics
+                    oswald_black_36,
+                    560,
+                    150, {
+                        text: `${lng.min}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Kills title
+                    oswald_white_24,
+                    43,
+                    207, {
+                        text: `${lng.kills}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Kills data
+                    oswald_orange_48,
+                    40,
+                    230, {
+                        text: `${kills}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Kills metrics
+                    oswald_black_36,
+                    40,
+                    280, {
+                        text: `${lng.kills.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Total Damage title
+                    oswald_white_24,
+                    304,
+                    207, {
+                        text: `${lng.totaldamage}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Total Damage data
+                    oswald_orange_48,
+                    304,
+                    230, {
+                        text: `${Math.ceil(totalDamage)}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Total Damage metrics
+                    oswald_black_36,
+                    305,
+                    280, {
+                        text: `${lng.hp.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Revives title
+                    oswald_white_24,
+                    570,
+                    207, {
+                        text: `${lng.revives}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Revives data
+                    oswald_orange_48,
+                    560,
+                    230, {
+                        text: `${revives}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Revives metrics
+                    oswald_black_36,
+                    560,
+                    280, {
+                        text: `${lng.times.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Assists title
+                    oswald_white_24,
+                    43,
+                    335, {
+                        text: `${lng.assists}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Assists data
+                    oswald_orange_48,
+                    40,
+                    360, {
+                        text: `${assists}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Used heals metrics
+                    oswald_black_36,
+                    40,
+                    410, {
+                        text: `${lng.times.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Used heals title
+                    oswald_white_24,
+                    304,
+                    335, {
+                        text: `${lng.usedheals}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Used heals data
+                    oswald_orange_48,
+                    304,
+                    360, {
+                        text: `${heals}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Used heals metrics
+                    oswald_black_36,
+                    304,
+                    410, {
+                        text: `${lng.times.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Used boosts title
+                    oswald_white_24,
+                    570,
+                    335, {
+                        text: `${lng.usedboosts}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Used boosts data
+                    oswald_orange_48,
+                    560,
+                    360, {
+                        text: `${boosts}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Used boosts metrics
+                    oswald_black_36,
+                    560,
+                    410, {
+                        text: `${lng.times.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // On car title
+                    oswald_white_24,
+                    43,
+                    465, {
+                        text: `${lng.traveledoncar}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // On car data
+                    oswald_orange_48,
+                    43,
+                    490, {
+                        text: `${roundUp(traveledOnCar, 1)}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // On car metrics
+                    oswald_black_36,
+                    43,
+                    540, {
+                        text: `${lng.meters_singular.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // On foot title
+                    oswald_white_24,
+                    304,
+                    465, {
+                        text: `${lng.walked}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // On foot data
+                    oswald_orange_48,
+                    304,
+                    490, {
+                        text: `${roundUp(traveledOnWalk, 1)}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // On foot metrics
+                    oswald_black_36,
+                    304,
+                    540, {
+                        text: `${lng.meters_singular.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Sum title
+                    oswald_white_24,
+                    570,
+                    465, {
+                        text: `${lng.swum}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT
+                    },
+                    183
+                )
+                .print(
+                    // Swum data
+                    oswald_orange_48,
+                    560,
+                    490, {
+                        text: `${swimDistance}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+                .print(
+                    // Swum metrics
+                    oswald_black_36,
+                    560,
+                    540, {
+                        text: `${lng.meters_singular.toUpperCase()}`,
+                        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
+                    },
+                    200
+                )
+            img.getBuffer(Jimp.AUTO, async (err, buffer) => {
+                await message.reply('', {
+                    file: buffer
+                });
+            });
+
+        }
+        genStats();
+    } catch (err) {
+        console.log(err)
+        await message.reply(`${lng.wrongargs} **${client.config.prefix}help**`);
+    }
+    logger.info(`${message.author.tag} (${message.author.id}) - ${lng.execcmd} ${__filename.split(/[\\/]/).pop().split(".")[0]}`)
 }

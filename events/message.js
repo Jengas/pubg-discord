@@ -1,6 +1,5 @@
 module.exports = async (client, message) => {
-  const talkedRecently = client.talkedRecently;
-
+  
   // Ignore all bots
   if (message.author.bot) return;
 
@@ -8,6 +7,7 @@ module.exports = async (client, message) => {
   if (message.content.indexOf(client.config.prefix) !== 0) return;
   // If message to DM
   if (message.channel.type == 'dm') return;
+  
 
   // Our standard argument/command name definition.
   const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
