@@ -11,7 +11,7 @@ exports.run = async (client, message, args) => {
 
     var serverData = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id)
     if (serverData == undefined) {
-        dbsql.prepare('INSERT INTO servers (language, serverid) VALUES (?, ?)').run('en', mesage.guild.id);
+        dbsql.prepare('INSERT INTO servers (language, serverid) VALUES (?, ?)').run('en', message.guild.id);
     }
     if (serverData.language == 'ru') {
         var lng = lang.ru;
