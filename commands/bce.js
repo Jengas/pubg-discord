@@ -21,12 +21,24 @@ exports.run = async (client, message, args) => {
     switch (args[0]) {
         case "lang":
             if (args[1] == 'en') {
-                dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run('en', message.guild.id);
-                message.reply('👍');
+                var serverdata = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id);
+                if (serverdata == undefined) {
+                    dbsql.prepare('INSERT INTO servers (language, serverid) VALUES (?, ?)').run(args[1], mesage.guild.id);
+                    message.reply('👍');
+                } else {
+                    dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run(args[1], message.guild.id);
+                    message.reply('👍');
+                }
             } else
             if (args[1] == 'ru') {
-                dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run('ru', message.guild.id);
-                message.reply('👍');
+                var serverdata = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id);
+                if (serverdata == undefined) {
+                    dbsql.prepare('INSERT INTO servers (language, serverid) VALUES (?, ?)').run(args[1], mesage.guild.id);
+                    message.reply('👍');
+                } else {
+                    dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run(args[1], message.guild.id);
+                    message.reply('👍');
+                }
             } else {
                 message.reply(lng.wrongarg);
             }
