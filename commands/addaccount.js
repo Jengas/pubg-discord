@@ -20,7 +20,7 @@ exports.run = async (client, message, args) => {
 
   var GetUserCheck = dbsql.prepare('SELECT userid, pubgUser FROM users WHERE userid=?').get(message.author.id)
 
-  message.reply(addacc_info);
+  message.reply(lng.addacc_info);
   const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, {
     time: 60 * 1000
   });
@@ -33,9 +33,9 @@ exports.run = async (client, message, args) => {
       var server_list = server_list + "\n" + PUBGservers[i];
     }
     var server_list = server_list.replace("undefined", "");
-    serversEmbed.addField(servers, server_list, false)
+    serversEmbed.addField(lng.servers, server_list, false)
     if (!PUBGservers.includes(message.content)) {
-      message.reply(`${specifyserver}:`, serversEmbed);
+      message.reply(`${lng.specifyserver}:`, serversEmbed);
     }
     if (PUBGservers.includes(message.content)) {
       list_array.push(message.content)
@@ -49,16 +49,16 @@ exports.run = async (client, message, args) => {
 
         if (GetUserCheck == undefined) {
           dbsql.prepare('INSERT INTO users (userid, pubgUser, pubgServer) VALUES (?, ?, ?)').run(message.author.id, list_array[0], list_array[list_array.length - 1])
-          logger.info(`${message.author.tag} ${addedacctodb} ${list_array[0]}`);
+          logger.info(`${message.author.tag} ${lng.addedacctodb} ${list_array[0]}`);
         } else {
           dbsql.prepare('UPDATE users SET pubgUser = ?, pubgServer = ? WHERE userid=?').run(list_array[0], list_array[list_array.length - 1], message.author.id)
-          logger.info(`${message.author.tag} ${changeaccdb} ${list_array[0]}`);
+          logger.info(`${message.author.tag} ${lng.changeaccdb} ${list_array[0]}`);
         }
 
-        message.reply(successaccchange)
+        message.reply(lng.successaccchange)
         collector.stop()
       } catch (e) {
-        message.reply(wrongaccname);
+        message.reply(lng.wrongaccname);
         collector.stop()
       }
     }
