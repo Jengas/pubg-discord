@@ -3,6 +3,7 @@
 
 [![GitHub license](https://img.shields.io/github/license/Jengas/pubg-discord.svg)](https://github.com/Jengas/pubg-discord/blob/master/LICENSE)
 
+[![DiscordBots](https://discordbots.org/api/widget/442019408446095370.svg)](https://discordbots.org/bot/442019408446095370)
 ### Features
 
 - Show stats about your match;
