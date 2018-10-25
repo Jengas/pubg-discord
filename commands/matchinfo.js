@@ -50,7 +50,7 @@ exports.run = async (client, message, args) => {
         var swimDistance = getValues(userObject, 'swimDistance');
 
         var teammatesObject = getObjects(Match, 'winPlace', winPlace);
-        var teammatesName = getValues(teammatesObject, 'name');
+        var teammatesName = getValues(teammatesObject, 'name').slice(0, 4);
 
         async function genStats() {
             var oswald_white_24 = await Jimp.loadFont(`./data/fonts/oswald/oswald_white_24.fnt`);
