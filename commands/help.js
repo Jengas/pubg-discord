@@ -26,6 +26,8 @@ exports.run = async (client, message, args) => {
     .addField(`${lng.matchlist}:`, "__" + client.config.prefix + "matchlist NickName Server__\n[" + lng.example + ": ``" + client.config.prefix + "matchlist Jengas pc-eu``]", true)
     .addField(`${lng.matchinfo}:`, "__" + client.config.prefix + "matchinfo NickName MatchID__\n[" + lng.example + ": ``" + client.config.prefix + "matchinfo Jengas 1de1332c-985a-4825-b320-32e40e24b6ef``]", true)
     .addField(`${lng.getstatseverymatch}:`, "__" + client.config.prefix + "notify__\n[" + lng.example + ": ``" + client.config.prefix + "notify``]", true)
+    .addField(`${lng.bce}:`, "__" + client.config.prefix + "bce__\n[" + lng.example + ": ``" + client.config.prefix + "bce``]", true)
+    .addField(`${lng.uce}:`, "__" + client.config.prefix + "uce__\n[" + lng.example + ": ``" + client.config.prefix + "uce``]", true)
 
   await message.reply(helpEmbed);
   logger.info(`${message.author.tag} (${message.author.id}) - ${lng.execcmd} ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
