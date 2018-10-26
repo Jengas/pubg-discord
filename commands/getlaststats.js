@@ -6,6 +6,7 @@ exports.run = async (client, message, args) => {
     const pubgClient = client.pubgClient;
     const getObjects = client.getObjects;
     const getValues = client.getValues;
+    const roundUp = client.roundUp;
     const messageUp = client.messageUp;
     const lang = client.lang;
     const Jimp = client.Jimp;
