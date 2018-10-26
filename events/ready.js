@@ -942,9 +942,14 @@ module.exports = async (client, message) => {
               200
             )
           img.getBuffer(Jimp.AUTO, async (err, buffer) => {
-            await client.users.get(userData.userid).send(client.users.get(userData.userid).toString(), {
-              file: buffer
-            });
+            try {
+              await client.users.get(userData.userid).send(client.users.get(userData.userid).toString(), {
+                file: buffer
+              });
+            } catch (error) {
+              dbsql.prepare("UPDATE users SET notify = ? WHERE userid=?").run("0", userData.userid);
+              logger.error(`Error sending stats to user with id ${userData.userid}\n${error}`);
+            }
           });
 
         }
