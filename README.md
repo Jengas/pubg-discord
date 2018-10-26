@@ -71,6 +71,10 @@
 <table>
 <tbody>
 <tr>
+<td>Get help</td>
+<td><code>$help</code></td>
+</tr>
+<tr>
 <td>Add PUBG account</td>
 <td><code>$addaccount</code></td>
 </tr>
@@ -97,6 +101,10 @@
 <tr>
 <td>Bot server config</td>
 <td><code>$bce</code></td>
+</tr>
+<tr>
+<td>User config</td>
+<td><code>$uce</code></td>
 </tr>
 </tbody>
 </table>
