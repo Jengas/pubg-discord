@@ -14,4 +14,6 @@ module.exports = async (client, guild) => {
     }
   }
 
+  logger.info('BOT has been added to new server'+guild.name+` [${guild.id}]`)
+
 };
