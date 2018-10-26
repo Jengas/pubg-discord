@@ -970,7 +970,7 @@ module.exports = async (client, message) => {
     }
   }
   
-  async function checkUsers(params) {
+  async function checkUsers() {
     var usersData = dbsql.prepare('SELECT * FROM users WHERE notify=? AND notifyLocation = ?').all("1", "dm");
     await asyncUserStats(usersData);
   }
