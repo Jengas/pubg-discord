@@ -23,12 +23,10 @@ exports.run = async (client, message, args) => {
     switch (args[0]) {
         case "lang":
             if (args[1] == 'en') {
-                var serverdata = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id);
                 dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run(args[1], message.guild.id);
                 message.reply('👍');
             } else
             if (args[1] == 'ru') {
-                var serverdata = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id);
                 dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run(args[1], message.guild.id);
                 message.reply('👍');
             } else {
@@ -43,6 +41,18 @@ exports.run = async (client, message, args) => {
                 message.reply(lng.wrongarg);
             }
             break;
+        case "toggle":
+            if (args[1] == 'true') {
+                dbsql.prepare('UPDATE servers SET stats_toggle = ?, stats_channel = CASE WHEN stats_channel IS NULL THEN ? ELSE stats_channel END WHERE serverid = ?').run('1', message.channel.id, message.guild.id);
+                message.reply('👍');
+            } else
+            if (args[1] == 'false') {
+                dbsql.prepare('UPDATE servers SET stats_toggle = ? WHERE serverid = ?').run('0', message.guild.id);
+                message.reply('👍');
+            } else {
+                message.reply(lng.wrongarg);
+            }
+            break;
         default:
             var BCEhelpEmbed = new Discord.RichEmbed()
                 .setTitle("PUBG BOT " + lng.commands)
@@ -51,6 +61,7 @@ exports.run = async (client, message, args) => {
                 .setTimestamp()
                 .addField(`${lng.serverlanguage}:`, "__" + client.config.prefix + "bce lang BOTLANGUAGE__\n[" + lng.example + "``" + client.config.prefix + "bce lang en``]", true)
                 .addField(`${lng.stats_channel}:`, "__" + client.config.prefix + "bce statsChannel CHANNELID__\n[" + lng.example + "``" + client.config.prefix + "bce statsChannel 494781230577783888``]", true)
+                .addField(`${lng.notify_toggle}:`, "__" + client.config.prefix + "bce toggle BOOLEAN__\n[" + lng.example + "``" + client.config.prefix + "bce toggle false``]", true)
 
             await message.reply(BCEhelpEmbed);
             break;
