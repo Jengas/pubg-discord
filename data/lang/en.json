@@ -73,5 +73,6 @@
     "notify_error": "Due to an obscure error, I had to disable your match notifications. Please try again.",
     "notify_server_forbid": "your statistics cannot be published on this server.",
     "uce": "User config",
-    "bce": "Bot config"
+    "bce": "Bot config",
+    "bot_invite_message": "Hi! If you want to add me to your server, here's the link:"
 }
