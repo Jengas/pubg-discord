@@ -106,5 +106,9 @@
 <td>User config</td>
 <td><code>$uce</code></td>
 </tr>
+<tr>
+<td>Invite link</td>
+<td><code>$invite</code></td>
+</tr>
 </tbody>
 </table>
