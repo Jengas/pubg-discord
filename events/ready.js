@@ -30,8 +30,8 @@ module.exports = async (client, message) => {
 
 
   async function asyncServerStats(serverdata, userdata) {
-    if (serverdata.language == 'ru') {
-      var lng = lang.ru;
+    if (serverdata.language) {
+      var lng = lang[serverdata.language];
     } else {
       var lng = lang.en;
     }
@@ -497,8 +497,8 @@ module.exports = async (client, message) => {
 
     for (let i = 0; i < userdata.length; i++) {
       var userData = userdata[i];
-      if (userData.language == 'ru') {
-        var lng = lang.ru;
+      if (userData.language) {
+        var lng = lang[userData.language];
       } else {
         var lng = lang.en;
       }
