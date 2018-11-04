@@ -12,8 +12,8 @@ exports.run = async (client, message, args) => {
         }
         var serverData = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id)
     }
-    if (serverData.language == 'ru') {
-        var lng = lang.ru;
+    if (serverData.language) {
+        var lng = lang[serverData.language];
     } else {
         var lng = lang.en;
     }

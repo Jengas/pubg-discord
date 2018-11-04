@@ -6,6 +6,7 @@ exports.run = async (client, message, args) => {
     const dbsql = client.dbsql;
 
     const lang = client.lang;
+    
 
     if (!message.channel.permissionsFor(message.author).has("MANAGE_GUILD")) return;
 
@@ -18,8 +19,8 @@ exports.run = async (client, message, args) => {
         }
         var serverData = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id)
     }
-    if (serverData.language == 'ru') {
-        var lng = lang.ru;
+    if (serverData.language) {
+        var lng = lang[serverData.language];
     } else {
         var lng = lang.en;
     }
@@ -27,11 +28,7 @@ exports.run = async (client, message, args) => {
 
     switch (args[0]) {
         case "lang":
-            if (args[1] == 'en') {
-                dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run(args[1], message.guild.id);
-                message.reply('👍');
-            } else
-            if (args[1] == 'ru') {
+            if (lang[args[1]]) {
                 dbsql.prepare('UPDATE servers SET language = ? WHERE serverid = ?').run(args[1], message.guild.id);
                 message.reply('👍');
             } else {
