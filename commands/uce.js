@@ -27,11 +27,7 @@ exports.run = async (client, message, args) => {
 
     switch (args[0]) {
         case "lang":
-            if (args[1] == 'en') {
-                dbsql.prepare('UPDATE users SET language = ? WHERE userid = ?').run(args[1], message.author.id);
-                message.reply('👍');
-            } else
-            if (args[1] == 'ru') {
+            if (lang[args[1]]) {
                 dbsql.prepare('UPDATE users SET language = ? WHERE userid = ?').run(args[1], message.author.id);
                 message.reply('👍');
             } else {
