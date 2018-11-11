@@ -2,6 +2,7 @@ module.exports = async (client, guild) => {
 
   //sqlite
   const dbsql = client.dbsql;
+  const logger = client.logger;
 
 
   var getServer = dbsql.prepare('SELECT * FROM servers WHERE serverid=?').get(guild.id);
