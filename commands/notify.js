@@ -61,7 +61,7 @@ exports.run = async (client, message, args) => {
         .setColor("#f7c121")
         .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
         .setTimestamp()
-        .addField(`${lng.notify_toggle}:`, "__" + client.config.prefix + "notify toggle__\n[" + lng.example + "``" + client.config.prefix + "toggle``]", false)
+        .addField(`${lng.notify_toggle}:`, "__" + client.config.prefix + "notify toggle__\n[" + lng.example + "``" + client.config.prefix + "notify toggle``]", false)
         .addBlankField()
         .addField(`${lng.list}:`, "``dm``\n``server``", false)
         .addField(`${lng.notify}:`, "__" + client.config.prefix + "notify LOCATION BOOLEAN__\n[" + lng.example + "``" + client.config.prefix + "notify dm true``]", false)
