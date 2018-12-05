@@ -5,22 +5,10 @@
   "pubg": {
     "pubgtoken": "PUBGTokenHere",
     "PUBGservers": [
-      "pc-na",
-      "pc-eu",
-      "pc-ru",
-      "pc-as",
-      "pc-oc",
-      "pc-sa",
-      "pc-sea",
-      "pc-krjp",
-      "pc-jp",
-      "pc-kakao",
-
-      "xbox-na",
-      "xbox-eu",
-      "xbox-as",
-      "xbox-oc",
-      "xbox-sa"
+      "steam",
+      "psn",
+      "xbox",
+      "kakao"
     ],
     "notify_interval": 200
   }
