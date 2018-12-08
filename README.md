@@ -25,44 +25,20 @@
 <table>
 <tbody>
 <tr>
-<td>pc-na</td>
-<td>North America</td>
+<td>steam</td>
+<td>PC version of game</td>
 </tr>
 <tr>
-<td>pc-eu</td>
-<td>Europe</td>
+<td>xbox</td>
+<td>Xbox version of game</td>
 </tr>
 <tr>
-<td>pc-ru</td>
-<td>Russia</td>
+<td>psn</td>
+<td>Playstation version of game</td>
 </tr>
 <tr>
-<td>pc-as</td>
-<td>Asia</td>
-</tr>
-<tr>
-<td>pc-oc</td>
-<td>Oceania</td>
-</tr>
-<tr>
-<td>pc-sa</td>
-<td>South America</td>
-</tr>
-<tr>
-<td>pc-sea&nbsp;</td>
-<td>Singapore</td>
-</tr>
-<tr>
-<td>pc-krjp</td>
-<td>Korea &amp; Japan</td>
-</tr>
-<tr>
-<td>pc-jp</td>
-<td>Japan</td>
-</tr>
-<tr>
-<td>&nbsp;pc-kakao</td>
-<td>Kakao games</td>
+<td>kakao</td>
+<td>Kakao version of game</td>
 </tr>
 </tbody>
 </table>
