@@ -45,7 +45,7 @@
     "statsaboutplayer": "Statistics about player",
     "secondsin": "seconds in",
     "gamemode_plur": "gamemode",
-    "serverlanguage": "Specify bot language. `ru` or `en`",
+    "serverlanguage": "Specify bot language.",
     "stats_channel": "Specify channel id where stats will be displayed after the match",
     "wrongarg": "Wrong arguments!",
     "user": "User",
