@@ -22,7 +22,7 @@
     "enmap": "^2.7.2",
     "jimp": "^0.5.6",
     "log4js": "^3.0.6",
-    "pubg.js": "git+https://github.com/Jengas/pubg.js.git"
+    "pubg.js": "git+https://github.com/ickerio/pubg.js.git"
   },
   "homepage": "https://github.com/Jengas/pubg-discord"
 }
