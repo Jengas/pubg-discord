@@ -57,3 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+/settings/config.json
+/data/data.db
+/data/logs/all.log
+/old_bot
+/package-lock.json

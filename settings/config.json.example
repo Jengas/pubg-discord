@@ -1,9 +1,9 @@
 {
   "prefix": "$",
-  "token": "DiscordTokenHere",
+  "token": "YourDiscordTokenHere",
   "game": "solo ffp",
   "pubg": {
-    "pubgtoken": "PUBGTokenHere",
+    "pubgtoken": "YourPUBGTokenHere",
     "PUBGservers": [
       "steam",
       "psn",
