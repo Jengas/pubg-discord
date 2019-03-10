@@ -43,8 +43,6 @@ exports.run = async (client, message, args) => {
             matchPlayer = player;
         })
         .catch((error) => {
-            console.log('playererr', error);
-
             message.reply(`I couldn't find such a player. Are you sure you typed it right?`);
         });
 
@@ -56,8 +54,6 @@ exports.run = async (client, message, args) => {
             matchData = match;
         })
         .catch((error) => {
-            console.log('matcherr', error);
-
             message.reply(`I couldn't find such match. Are you sure you typed it right?`);
         });
 
