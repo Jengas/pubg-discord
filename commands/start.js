@@ -60,17 +60,19 @@ exports.run = async (client, message, args) => {
                 switch (message.content) {
                     case '+':
                         await message.reply(`Great! You want to receive notifications in DM?\n**+**: Yes\n**-**: No`);
+                        isNotifyUserSelected = true;
                         break;
                     case '-':
                         await message.reply(`Sadly. Then you can get statistics manually!`);
+                        isNotifyUserSelected = true;
                         break;
                 }
-                isNotifyUserSelected = true;
             } else if (isUserAdded && isServerSelected && isNotifyUserSelected) {
                 switch (message.content) {
                     case '+':
                         dbsql.prepare("UPDATE users SET notify = ?, notifyLocation = ? WHERE userid=?").run("1", 'dm', message.author.id)
                         await message.reply(lng.notify_dm_true);
+                        collector.stop();
                         break;
                     case '-':
                         if (serverData.stats_toggle == '0') {
@@ -81,9 +83,9 @@ exports.run = async (client, message, args) => {
                             dbsql.prepare("UPDATE users SET notify = ?, notifyLocation = ? WHERE userid=?").run("1", 'server', message.author.id)
                             await message.reply(lng.notify_server_true);
                         }
+                        collector.stop();
                         break;
                 }
-                collector.stop();
             }
         });
         await message.delete()
