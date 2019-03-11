@@ -13,56 +13,51 @@ exports.run = async (client, message, args) => {
     let playerName = args[0];
     let playerRegion = args[1];
 
-    if (typeof playerName == 'undefined') {
-        await message.reply(`${lng.namenotspecified}: **${client.config.prefix}help**`);
-        return;
-    } else
-    if (typeof playerRegion == 'undefined') {
-        await message.reply(`${lng.servernotspecified}: **${client.config.prefix}help**`);
-        return;
-    } else
-    if (!PUBGservers.includes(playerRegion)) {
-        await message.reply(lng.server_notexists);
-        return;
-    }
+    if (typeof playerName == 'undefined') return await message.reply(`You haven't specified player name. See syntax **${client.config.prefix}help**`);
+    if (typeof playerRegion == 'undefined') return await message.reply(`You haven't specified platform. See syntax: **${client.config.prefix}help**`);
+    if (!PUBGservers.includes(playerRegion)) return await message.reply(`Platform that you have specified doesn't exist`);
 
 
     let matchId;
     let matchData;
     let matchPlayer;
 
+    let playerNotFound = false;
 
     await pubgClient.player({
             name: playerName,
             region: playerRegion,
         })
         .then((player) => {
-
             matchId = player.data[0].relationships.matches.data[0].id;
-
             matchPlayer = player;
         })
         .catch((error) => {
-            message.reply(`I couldn't find such a player. Are you sure you typed it right?`);
+            playerNotFound = true
+            message.reply(`I couldn't find a player. Are you sure it exists?`);
         });
 
-    await pubgClient.match({
-            region: playerRegion,
-            id: matchId
-        })
-        .then((match) => {
-            matchData = match;
-        })
-        .catch((error) => {
-            message.reply(`I couldn't find such match. Are you sure you typed it right?`);
-        });
+    if (!playerNotFound) {
+        await pubgClient.match({
+                region: playerRegion,
+                id: matchId
+            })
+            .then((match) => {
+                matchData = match;
+            })
+            .catch((error) => {
+                message.reply(`I couldn't find a match. Are you sure it exists?`);
+            });
+    }
 
 
     genStats(matchPlayer, matchData, lng).then(async buffer => {
         await message.reply('', {
             file: buffer
         });
-    });
+    }).catch(err=>err);
 
-    logger.info(`${message.author.tag} (${message.author.id}) - ${lng.execcmd} ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
+    await message.delete()
+        .then(msg => logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`))
+        .catch(console.error);
 }
