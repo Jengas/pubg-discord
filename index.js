@@ -192,6 +192,7 @@ const getServerLanguage = (incomeMessage) => {
 const genStats = async (player, match, lng) => {
     return new Promise(async (resolve, reject) => {
 
+        if (!player) return await reject(`This player is not in this match!`);
         let userObject = getObjects(match, '', player.data[0].attributes.name);
 
         let winPlace = getValues(userObject, 'winPlace');
