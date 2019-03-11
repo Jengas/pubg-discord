@@ -1,60 +1,52 @@
 exports.run = async (client, message, args) => {
   const Discord = client.Discord;
+  const dbsql = client.dbsql;
   const logger = client.logger;
   const pubgClient = client.pubgClient;
-  const dbsql = client.dbsql;
-  const lang = client.lang;
+  const PUBGservers = client.PUBGservers;
+  const genStats = client.genStats;
+  const getServerLanguage = client.getServerLanguage;
 
-  var serverData = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id)
-  if (serverData == undefined) {
-    if (message.guild.region == 'russia') {
-      dbsql.prepare('INSERT INTO servers (serverid, language) VALUES (?, ?)').run(message.guild.id, 'ru');
-    } else {
-      dbsql.prepare('INSERT INTO servers (serverid) VALUES (?)').run(message.guild.id);
-    }
-    var serverData = dbsql.prepare('SELECT * FROM servers WHERE serverid = ?').get(message.guild.id)
+  let lng = await getServerLanguage(message).then(l => l);
+
+  let playerName = args[0];
+  let playerRegion = args[1];
+
+  if (typeof playerName == 'undefined') return await message.reply(`You haven't specified player name. See syntax **${client.config.prefix}help**`);
+  if (typeof playerRegion == 'undefined') return await message.reply(`You haven't specified platform. See syntax: **${client.config.prefix}help**`);
+  if (!PUBGservers.includes(playerRegion)) return await message.reply(`Platform that you have specified doesn't exist`);
+
+  let matches;
+  let player;
+
+  await pubgClient.player({
+      name: playerName,
+      region: playerRegion,
+    })
+    .then((pl) => {
+      matches = pl.data[0].relationships.matches.data;
+      player = pl;
+    })
+    .catch((error) => {
+      message.reply(`I couldn't find a player. Are you sure it exists?`);
+    });
+
+  const matchlistEmbed = new Discord.RichEmbed()
+    .setTitle(`List of mathes`)
+    .setAuthor(playerName, "https://i.imgur.com/O8Q7Eqq.png")
+    .setColor("#f7c121")
+    .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
+    .setThumbnail("https://i.imgur.com/4NHuKRX.png")
+    .setTimestamp()
+  for (let i = 0; i < 20; i++) {
+    var msg = matches[i];
+    if (!msg) continue;
+    matchlistEmbed.addField(i + 1, "```fix\n" + msg.id + "\n```", false)
   }
-  if (serverData.language) {
-    var lng = lang[serverData.language];
-  } else {
-    var lng = lang.en;
-  }
 
-  try {
-    let playerName = args[0];
-    let playerRegion = args[1];
-    if (typeof playerName == 'undefined') {
-      await message.reply(`${lng.namenotspecified}: **${client.config.prefix}help**`);
-      return;
-    } else
-    if (typeof playerRegion == 'undefined') {
-      await message.reply(`${lng.servernotspecified}: **${client.config.prefix}help**`);
-      return;
-    }
-    const Player = await pubgClient.getPlayer({
-      name: playerName
-    }, playerRegion);
-    const Match = await Player.relationships.matches
+  await message.reply(`Here is the match list of **${player.data[0].attributes.name}**`, matchlistEmbed);
 
-    const matchlistEmbed = new Discord.RichEmbed()
-      .setTitle(lng.listofmatches_1)
-      .setAuthor(playerName, "https://i.imgur.com/O8Q7Eqq.png")
-      .setColor("#f7c121")
-      .setFooter("PUBG BOT", "https://i.imgur.com/O8Q7Eqq.png")
-      .setThumbnail("https://i.imgur.com/4NHuKRX.png")
-      .setTimestamp()
-      .addBlankField(true)
-    for (var i = 0; i < 20; i++) {
-      var msg = Match[i];
-      if (msg == null) {
-        continue;
-      }
-      matchlistEmbed.addField(i + 1, "```fix\n" + msg.id + "\n```", false)
-    }
-
-    await message.reply(`${lng.listofmatches} **${Player.attributes.name}**`, matchlistEmbed);
-  } catch (err) {
-    await message.reply(`${lng.wrongargs}: **${client.config.prefix}help**`);
-  }
-  logger.info(`${message.author.tag} (${message.author.id}) - ${lng.execcmd} ${__filename.split(/[\\/]/).pop().split(".")[0]}`);
+  await message.delete()
+    .then(msg => logger.info(`${message.author.tag} (${message.author.id}) - executed command ${__filename.split(/[\\/]/).pop().split(".")[0]}`))
+    .catch(console.error);
 }
