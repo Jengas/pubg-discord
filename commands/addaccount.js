@@ -47,7 +47,7 @@ exports.run = async (client, message, args) => {
       try {
         const Player = await pubgClient.getPlayer({
             name: list_array[0]
-          })
+          }, list_array[1])
           .then(player => player)
           .catch(error => console.log(error))
         var user_try = Player.attributes.name;
