@@ -98,7 +98,7 @@ exports.run = async (client, message, args) => {
                     oswald_orange_32,
                     30,
                     6, {
-                        text: `${Player.attributes.name}`,
+                        text: `${playerName}`,
                         alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
                         alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                     }
